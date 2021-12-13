@@ -98,7 +98,7 @@ export default {
 		//Remove listeners after audio play stops
 		cleanupListeners() {
 			let player = this.$refs.player;
-			player.removeEventListener("timeupdate", this.playbackListener);
+			player.removeEventListener("freqtimeupdate", this.playbackListener);
 			player.removeEventListener("ended", this.endListener);
 			player.removeEventListener("pause", this.pauseListener);
 			console.log("All cleaned up!");
@@ -160,9 +160,8 @@ export default {
 					//prevent starting multiple listeners at the same time
 					if (!this.listenerActive) {
 						this.listenerActive = true;
-						//for a more consistent timeupdate, include freqtimeupdate.js and replace both instances of 'timeupdate' with 'freqtimeupdate'
 						player.addEventListener(
-							"timeupdate",
+							"freqtimeupdate",
 							this.playbackListener
 						);
 					}
