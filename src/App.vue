@@ -8,6 +8,7 @@ https://muhammadatt.medium.com/building-an-mp3-audio-player-in-vue-js-c588420725
 			controls
 			id="player"
 			ref="player"
+			preload="metadata"
 			src="https://www.ryanburney.com/assets/carla-bruni---il-vecchio-e-il-bambino.flac"
 		>
 			Your browser does not support the <code>audio</code> element.
@@ -23,8 +24,8 @@ https://muhammadatt.medium.com/building-an-mp3-audio-player-in-vue-js-c588420725
 				id="position"
 				name="position"
 			/>
-			<span v-html="elapsedTime()">00:00</span>
-			<span v-html="totalTime()">00:00</span>
+			<span>{{ elapsedTime() }}</span>
+			<span>{{ totalTime() }}</span>
 		</div>
 	</div>
 </template>
@@ -33,10 +34,10 @@ https://muhammadatt.medium.com/building-an-mp3-audio-player-in-vue-js-c588420725
 export default {
 	data() {
 		return {
-			playbackTime: 0,
 			audioDuration: 100,
 			audioLoaded: false,
 			isPlaying: false,
+			playbackTime: 0,
 			playButtonText: "Play",
 		};
 	},
@@ -44,25 +45,25 @@ export default {
 	methods: {
 		// Set the range slider max value equal to audio duration
 		initSlider() {
-			let audio = this.$refs.player;
-			if (audio) {
-				this.audioDuration = Math.round(audio.duration);
+			let player = this.$refs.player;
+			if (player) {
+				this.audioDuration = Math.round(player.duration);
 			}
 		},
 
 		//Convert audio current time from seconds to min:sec display
 		convertTime(seconds) {
-			const format = (val) => `0${Math.floor(val)}`.slice(-2);
-			// var hours = seconds / 3600;
-			var minutes = (seconds % 3600) / 60;
-			return [minutes, seconds % 60].map(format).join(":");
+			const FORMAT = (val) => `0${Math.floor(val)}`.slice(-2);
+			let minutes = (seconds % 3600) / 60;
+
+			return [minutes, seconds % 60].map(FORMAT).join(":");
 		},
 
 		elapsedTime() {
-			var audio = this.$refs.player;
-			if (audio) {
-				var seconds = audio.currentTime;
-				return this.convertTime(seconds);
+			let player = this.$refs.player;
+			
+			if (player) {
+				return this.convertTime(player.currentTime);
 			} else {
 				return "00:00";
 			}
@@ -70,14 +71,14 @@ export default {
 
 		//Playback listener function runs every 100ms while audio is playing
 		playbackListener() {
-			var audio = this.$refs.player;
-			//Sync local 'playbackTime' var to audio.currentTime and update global state
-			this.playbackTime = audio.currentTime;
+			let player = this.$refs.player;
+			//Sync local 'playbackTime' var to player.currentTime and update global state
+			this.playbackTime = player.currentTime;
 
-			//console.log("update: " + audio.currentTime);
+			//console.log("update: " + player.currentTime);
 			//Add listeners for audio pause and audio end events
-			audio.addEventListener("ended", this.endListener);
-			audio.addEventListener("pause", this.pauseListener);
+			player.addEventListener("ended", this.endListener);
+			player.addEventListener("pause", this.pauseListener);
 		},
 
 		//Function to run when audio is paused by user
@@ -96,11 +97,11 @@ export default {
 
 		//Remove listeners after audio play stops
 		cleanupListeners() {
-			var audio = this.$refs.player;
-			audio.removeEventListener("timeupdate", this.playbackListener);
-			audio.removeEventListener("ended", this.endListener);
-			audio.removeEventListener("pause", this.pauseListener);
-			//console.log("All cleaned up!");
+			let player = this.$refs.player;
+			player.removeEventListener("timeupdate", this.playbackListener);
+			player.removeEventListener("ended", this.endListener);
+			player.removeEventListener("pause", this.pauseListener);
+			console.log("All cleaned up!");
 		},
 
 		toggleAudio() {
@@ -120,10 +121,10 @@ export default {
 
 		//Show the total duration of audio file
 		totalTime() {
-			var audio = this.$refs.player;
-			if (audio) {
-				var seconds = audio.duration;
-				return this.convertTime(seconds);
+			let player = this.$refs.player;
+
+			if (player) {
+				return this.convertTime(player.duration);
 			} else {
 				return "00:00";
 			}
@@ -133,33 +134,34 @@ export default {
 	mounted: function () {
 		// nextTick code will run only after the entire view has been rendered
 		this.$nextTick(function () {
-			var audio = this.$refs.player;
+			var player = this.$refs.player;
 			//Wait for audio to load, then run initSlider() to get audio duration and set the max value of our slider
 			// "loademetadata" Event https://www.w3schools.com/tags/av_event_loadedmetadata.asp
-			audio.addEventListener(
+			player.addEventListener(
 				"loadedmetadata",
 				function () {
 					this.initSlider();
 				}.bind(this)
 			);
 			// "canplay" HTML Event lets us know audio is ready for play https://www.w3schools.com/tags/av_event_canplay.asp
-			audio.addEventListener(
+			player.addEventListener(
 				"canplay",
 				function () {
 					this.audioLoaded = true;
 				}.bind(this)
 			);
+
 			//Wait for audio to begin play, then start playback listener function
 			this.$watch("isPlaying", function () {
 				if (this.isPlaying) {
-					var audio = this.$refs.player;
+					let player = this.$refs.player;
 					this.initSlider();
 					//console.log("Audio playback started.");
 					//prevent starting multiple listeners at the same time
 					if (!this.listenerActive) {
 						this.listenerActive = true;
 						//for a more consistent timeupdate, include freqtimeupdate.js and replace both instances of 'timeupdate' with 'freqtimeupdate'
-						audio.addEventListener(
+						player.addEventListener(
 							"timeupdate",
 							this.playbackListener
 						);
@@ -168,14 +170,14 @@ export default {
 			});
 			//Update current audio position when user drags progress slider
 			this.$watch("playbackTime", function () {
-				var audio = this.$refs.player;
-				var diff = Math.abs(
-					this.playbackTime - audio.currentTime
+				let player = this.$refs.player;
+				let diff = Math.abs(
+					this.playbackTime - player.currentTime
 				);
 
 				//Throttle synchronization to prevent infinite loop between playback listener and this watcher
 				if (diff > 0.01) {
-					audio.currentTime = this.playbackTime;
+					player.currentTime = this.playbackTime;
 				}
 			});
 		});
