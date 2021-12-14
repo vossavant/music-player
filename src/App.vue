@@ -9,7 +9,7 @@ https://muhammadatt.medium.com/building-an-mp3-audio-player-in-vue-js-c588420725
 			id="player"
 			ref="player"
 			preload="metadata"
-			src="https://www.ryanburney.com/assets/carla-bruni---il-vecchio-e-il-bambino.flac"
+			:src="audioFile"
 		>
 			Your browser does not support the <code>audio</code> element.
 		</audio>
@@ -24,6 +24,11 @@ https://muhammadatt.medium.com/building-an-mp3-audio-player-in-vue-js-c588420725
 				id="position"
 				name="position"
 			/>
+			<img v-if="trackPicture.src" :src="trackPicture.src" />
+			<span>
+				{{ trackTitle }} by {{ trackArtist }} (from {{ trackAlbum }}) |
+				{{ trackType }}
+			</span>
 			<span>{{ elapsedTime() }}</span>
 			<span>{{ totalTime() }}</span>
 		</div>
@@ -36,9 +41,15 @@ export default {
 		return {
 			audioDuration: 100,
 			audioLoaded: false,
+			audioFile: "http://localhost:8081/test.flac",
 			isPlaying: false,
 			playbackTime: 0,
 			playButtonText: "Play",
+			trackType: null,
+			trackAlbum: null,
+			trackArtist: null,
+			trackTitle: null,
+			trackPicture: {}
 		};
 	},
 
@@ -51,6 +62,46 @@ export default {
 			}
 		},
 
+		getID3tags() {
+			var jsmediatags = require("jsmediatags");
+			let self = this;
+
+			jsmediatags.read("http://localhost:8081/test.flac", {
+				onSuccess: function (result) {
+					console.log(result);
+					self.trackType = result.type;
+					self.trackAlbum = result.tags.album;
+					self.trackArtist = result.tags.artist;
+					self.trackTitle = result.tags.title;
+
+					const { data, format } = result.tags.picture;
+					let base64String = "";
+					for (let i = 0; i < data.length; i++) {
+						base64String += String.fromCharCode(data[i]);
+					}
+					self.trackPicture.src = `data:${data.format};base64,${window.btoa(
+						base64String
+					)}`;
+
+					console.log(self.trackPicture.src)
+				},
+				onError: function (error) {
+					console.log(":(", error.type, error.info);
+				},
+			});
+
+			// new jsmediatags.Reader("http://localhost:8081/test.flac")
+			// 	.setTagsToRead(["title", "artist"])
+			// 	.read({
+			// 		onSuccess: function (tag) {
+			// 			console.log(tag);
+			// 		},
+			// 		onError: function (error) {
+			// 			console.log(":(", error.type, error.info);
+			// 		},
+			// 	});
+		},
+
 		//Convert audio current time from seconds to min:sec display
 		convertTime(seconds) {
 			const FORMAT = (val) => `0${Math.floor(val)}`.slice(-2);
@@ -61,7 +112,7 @@ export default {
 
 		elapsedTime() {
 			let player = this.$refs.player;
-			
+
 			if (player) {
 				return this.convertTime(player.currentTime);
 			} else {
@@ -101,7 +152,6 @@ export default {
 			player.removeEventListener("freqtimeupdate", this.playbackListener);
 			player.removeEventListener("ended", this.endListener);
 			player.removeEventListener("pause", this.pauseListener);
-			console.log("All cleaned up!");
 		},
 
 		toggleAudio() {
@@ -140,6 +190,7 @@ export default {
 			player.addEventListener(
 				"loadedmetadata",
 				function () {
+					this.getID3tags();
 					this.initSlider();
 				}.bind(this)
 			);
@@ -170,9 +221,7 @@ export default {
 			//Update current audio position when user drags progress slider
 			this.$watch("playbackTime", function () {
 				let player = this.$refs.player;
-				let diff = Math.abs(
-					this.playbackTime - player.currentTime
-				);
+				let diff = Math.abs(this.playbackTime - player.currentTime);
 
 				//Throttle synchronization to prevent infinite loop between playback listener and this watcher
 				if (diff > 0.01) {
