@@ -4,33 +4,110 @@ https://muhammadatt.medium.com/building-an-mp3-audio-player-in-vue-js-c588420725
 -->
 <template>
 	<div id="app">
-		<audio
-			controls
-			id="player"
-			ref="player"
-			preload="metadata"
-			:src="audioFile"
-		>
-			Your browser does not support the <code>audio</code> element.
-		</audio>
-		<button @click="toggleAudio">{{ playButtonText }}</button>
+		<div class="player">
+			<img src="@/assets/logo.svg" alt="MusicBox logo" width="145">
+			<nav>
+				<h3>Music Library</h3>
+				<ul>
+					<li>
+						<a href="#albums">Albums</a>
+					</li>
+					<li>
+						<a href="#artists">Artists</a>
+					</li>
+					<li>
+						<a href="#favorites">Favorites</a>
+					</li>
+				</ul>
 
-		<div id="progress-bar">
-			<input
-				v-model="playbackTime"
-				type="range"
-				min="0"
-				:max="audioDuration"
-				id="position"
-				name="position"
-			/>
-			<img v-if="trackPicture.src" :src="trackPicture.src" />
-			<span>
-				{{ trackTitle }} by {{ trackArtist }} (from {{ trackAlbum }}) |
+				<h3>Playlists</h3>
+				<ul>
+					<li>
+						<a href="#">Air</a>
+					</li>
+					<li>
+						<a href="#">Another Late Night</a>
+					</li>
+					<li>
+						<a href="#">Blues Jukebox</a>
+					</li>
+					<li>
+						<a href="#">Code Monkey</a>
+					</li>
+					<li>
+						<a href="#">Dinner Party</a>
+					</li>
+					<li>
+						<a href="#">Globetrotter</a>
+					</li>
+				</ul>
+
+				<button>New Playlist</button>
+			</nav>
+
+			<main>
+				<header>
+					<h1>Another Late Night</h1>
+					<p>70 songs (5:32:14)</p>
+				</header>
+
+				<table>
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>Title</th>
+							<th>Album</th>
+							<th>Last Played</th>
+							<th>Duration</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<th>1</th>
+							<td>Hard to Stay Cool</td>
+							<td>Hard to Stay Cool</td>
+							<td>Dec 11, 2021</td>
+							<td>5:34</td>
+						</tr>
+					</tbody>
+				</table>
+			</main>
+
+			<!-- now playing -->
+			<article>
+				<audio
+					controls
+					id="player"
+					ref="player"
+					preload="metadata"
+					:src="audioFile"
+				>
+					Your browser does not support the <code>audio</code> element.
+				</audio>
+				<figure>
+					<img v-if="trackPicture" :src="trackPicture" :alt="trackAlbum + ' cover art'">
+					<figcaption>{{ trackAlbum }}</figcaption>
+				</figure>
+				<header>
+					<h1>{{ trackTitle }}</h1>
+					<h2>{{ trackArtist }}</h2>
+				</header>
+			</article>
+			
+			<div class="player__controls">
+				<button @click="toggleAudio">{{ playButtonText }}</button>
+				<input
+					v-model="playbackTime"
+					type="range"
+					min="0"
+					:max="audioDuration"
+					id="position"
+					name="position"
+				/>
+				<span>{{ elapsedTime() }}</span>
+				<span>{{ totalTime() }}</span>
 				{{ trackType }}
-			</span>
-			<span>{{ elapsedTime() }}</span>
-			<span>{{ totalTime() }}</span>
+			</div>
 		</div>
 	</div>
 </template>
@@ -41,7 +118,7 @@ export default {
 		return {
 			audioDuration: 100,
 			audioLoaded: false,
-			audioFile: "http://localhost:8081/test.flac",
+			audioFile: "http://localhost:8080/test.flac",
 			isPlaying: false,
 			playbackTime: 0,
 			playButtonText: "Play",
@@ -49,7 +126,7 @@ export default {
 			trackAlbum: null,
 			trackArtist: null,
 			trackTitle: null,
-			trackPicture: {}
+			trackPicture: null
 		};
 	},
 
@@ -66,7 +143,7 @@ export default {
 			var jsmediatags = require("jsmediatags");
 			let self = this;
 
-			jsmediatags.read("http://localhost:8081/test.flac", {
+			jsmediatags.read(this.audioFile, {
 				onSuccess: function (result) {
 					console.log(result);
 					self.trackType = result.type;
@@ -79,11 +156,9 @@ export default {
 					for (let i = 0; i < data.length; i++) {
 						base64String += String.fromCharCode(data[i]);
 					}
-					self.trackPicture.src = `data:${data.format};base64,${window.btoa(
+					self.trackPicture = `data:${data.format};base64,${window.btoa(
 						base64String
 					)}`;
-
-					console.log(self.trackPicture.src)
 				},
 				onError: function (error) {
 					console.log(":(", error.type, error.info);
