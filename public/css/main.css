@@ -1,3 +1,8 @@
+@font-face {
+	font-family: 'Mulish';
+	src: url('../fonts/Mulish-VariableFont_wght.ttf') format('truetype');
+}
+
 * {
 	box-sizing: border-box;
 }
@@ -6,10 +11,18 @@ html {
 	height: 100%;
 }
 
+a {
+	color: inherit;
+	text-decoration: none;
+}
+
 body {
 	background-color: #4158D0;
 	background-image: linear-gradient(43deg, #4158D0 0%, #C850C0 46%, #FFCC70 100%);
-	margin: 0;
+	font-family: 'Mulish', sans-serif;
+	font-size: 12px;
+	font-variation-settings: 'wght' 400;
+	margin: 12px;
 }
 
 audio,
@@ -22,14 +35,26 @@ img {
 	max-width: 100%;
 }
 
-#app {
-	margin: 12px;
-}
-
-.player {
+main {
 	background: #E5F3FF;
-	border-radius: 16px;
-	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 	margin: 0 auto;
 	padding: 24px;
+}
+
+#media-library {
+	display: flex;
+}
+
+/* utilities */
+
+.bg--white {
+	background: white;
+}
+
+.drop-shadow {
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.rounded--all {
+	border-radius: 16px;
 }
