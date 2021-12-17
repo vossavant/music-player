@@ -3,49 +3,11 @@ thanks to
 https://muhammadatt.medium.com/building-an-mp3-audio-player-in-vue-js-c5884207251c
 -->
 <template>
-	<div id="app">
-		<div class="player">
-			<img src="@/assets/logo.svg" alt="MusicBox logo" width="145">
-			<nav>
-				<h3>Music Library</h3>
-				<ul>
-					<li>
-						<a href="#albums">Albums</a>
-					</li>
-					<li>
-						<a href="#artists">Artists</a>
-					</li>
-					<li>
-						<a href="#favorites">Favorites</a>
-					</li>
-				</ul>
+	<main class="rounded--all drop-shadow">
+		<div id="media-library">
+			<BaseNav />
 
-				<h3>Playlists</h3>
-				<ul>
-					<li>
-						<a href="#">Air</a>
-					</li>
-					<li>
-						<a href="#">Another Late Night</a>
-					</li>
-					<li>
-						<a href="#">Blues Jukebox</a>
-					</li>
-					<li>
-						<a href="#">Code Monkey</a>
-					</li>
-					<li>
-						<a href="#">Dinner Party</a>
-					</li>
-					<li>
-						<a href="#">Globetrotter</a>
-					</li>
-				</ul>
-
-				<button>New Playlist</button>
-			</nav>
-
-			<main>
+			<section id="playlist" class="bg--white rounded--all">
 				<header>
 					<h1>Another Late Night</h1>
 					<p>70 songs (5:32:14)</p>
@@ -71,9 +33,12 @@ https://muhammadatt.medium.com/building-an-mp3-audio-player-in-vue-js-c588420725
 						</tr>
 					</tbody>
 				</table>
-			</main>
+			</section>
+		</div>
 
-			<!-- now playing -->
+		<section id="now-playing" class="bg--white rounded--all drop-shadow">
+			<h1>Now Playing</h1>
+
 			<article>
 				<audio
 					controls
@@ -94,26 +59,37 @@ https://muhammadatt.medium.com/building-an-mp3-audio-player-in-vue-js-c588420725
 				</header>
 			</article>
 			
-			<div class="player__controls">
-				<button @click="toggleAudio">{{ playButtonText }}</button>
-				<input
-					v-model="playbackTime"
-					type="range"
-					min="0"
-					:max="audioDuration"
-					id="position"
-					name="position"
-				/>
-				<span>{{ elapsedTime() }}</span>
-				<span>{{ totalTime() }}</span>
-				{{ trackType }}
-			</div>
-		</div>
-	</div>
+			<menu>
+				<li>
+					<button @click="toggleAudio">{{ playButtonText }}</button>
+				</li>
+				<li>
+					<input
+						v-model="playbackTime"
+						type="range"
+						min="0"
+						:max="audioDuration"
+						id="position"
+						name="position"
+					/>
+				</li>
+				<li>
+					<span>{{ elapsedTime() }}</span>
+					<span>{{ totalTime() }}</span>
+				</li>
+			</menu>
+		</section>
+	</main>
 </template>
 
 <script>
+import BaseNav from '@/components/BaseNav.vue';
+
 export default {
+	components: {
+		BaseNav,
+	},
+	
 	data() {
 		return {
 			audioDuration: 100,
