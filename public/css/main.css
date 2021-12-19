@@ -41,6 +41,10 @@ main {
 	padding: 24px;
 }
 
+menu {
+	list-style: none;
+}
+
 #media-library {
 	display: flex;
 }
@@ -57,4 +61,8 @@ main {
 
 .rounded--all {
 	border-radius: 16px;
+}
+
+.rounded--small {
+	border-radius: 8px;
 }
