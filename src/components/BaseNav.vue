@@ -86,7 +86,7 @@ nav {
 
 	h3 {
 		color: #3470A2;
-		font-weight: 600;
+		font-variation-settings: 'wght' 500;
 		margin: 32px 0 8px;
 	}
 
