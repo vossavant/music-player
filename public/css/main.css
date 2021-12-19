@@ -25,6 +25,10 @@ body {
 	margin: 12px;
 }
 
+button {
+	cursor: pointer;
+}
+
 audio,
 figcaption {
 	display: none;
