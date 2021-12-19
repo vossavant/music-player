@@ -29,9 +29,40 @@
 
 		<menu>
 			<li>
-				<button @click="toggleAudio">{{ playButtonText }}</button>
+				<button :class="{ 'off' : !shuffleOn }" @click="toggleShuffle">
+					<BaseIcon icon="shuffle" color="#000000" size="24" />
+				</button>
 			</li>
 			<li>
+				<button @click="skipPrev">
+					<BaseIcon icon="skip_previous" color="#000000" size="24" />
+				</button>
+			</li>
+			<li>
+				<button @click="rewindAudio">
+					<BaseIcon icon="fast_rewind" color="#000000" size="24" />
+				</button>
+			</li>
+			<li>
+				<button @click="toggleAudio">
+					<BaseIcon v-if="isPlaying" icon="pause_circle_outline" color="#000000" size="36" />
+					<BaseIcon v-else icon="play_circle_outline" color="#000000" size="36" />
+				</button>
+			</li>
+			<li>
+				<button @click="forwardAudio">
+					<BaseIcon icon="fast_forward" color="#000000" size="24" />
+				</button>
+			</li>
+			<li>
+				<button @click="skipNext">
+					<BaseIcon icon="skip_next" color="#000000" size="24" />
+				</button>
+			</li>
+			<li>
+				<button :class="{ 'off' : !repeatOn }" @click="toggleRepeat">
+					<BaseIcon icon="repeat" color="#000000" size="24" />
+				</button>
 				<input
 					v-model="playbackTime"
 					type="range"
@@ -41,16 +72,19 @@
 					name="position"
 				/>
 			</li>
-			<li>
-				<span>{{ elapsedTime() }}</span>
-				<span>{{ totalTime() }}</span>
-			</li>
 		</menu>
+		<p id="elapsed-time">{{ elapsedTime() }}</p>
 	</section>
 </template>
 
 <script>
+import BaseIcon from '@/components/BaseIcon.vue';
+
 export default {
+	components: {
+		BaseIcon,
+	},
+
 	data() {
 		return {
 			audioDuration: 100,
@@ -59,6 +93,8 @@ export default {
 			isPlaying: false,
 			playbackTime: 0,
 			playButtonText: "Play",
+			repeatOn: false,
+			shuffleOn: false,
 			trackType: null,
 			trackAlbum: null,
 			trackArtist: null,
@@ -149,6 +185,38 @@ export default {
 			this.isPlaying = false;
 			this.listenerActive = false;
 			this.cleanupListeners();
+		},
+
+		rewindAudio() {
+			alert('rewind 10s...');
+		},
+
+		forwardAudio() {
+			alert('forward 10s...');
+		},
+		
+		skipNext() {
+			alert('skip to next...');
+		},
+
+		skipPrev() {
+			alert('skip to prev...');
+		},
+		
+		toggleRepeat() {
+			if (this.repeatOn === false) {
+				this.repeatOn = true
+			} else {
+				this.repeatOn = false;
+			}
+		},
+		
+		toggleShuffle() {
+			if (this.shuffleOn === false) {
+				this.shuffleOn = true
+			} else {
+				this.shuffleOn = false;
+			}
 		},
 
 		//Function to run when audio play reaches the end of file
@@ -278,39 +346,72 @@ img {
 	width: $albumArtWidth;
 }
 
-menu input {
-	appearance: none;
-	background: transparent;
-	height: 9px;
-	left: $albumArtWidth;
-	margin: 0;
-	position: absolute;
-	right: 0;
-	top: -3px;
-	width: calc(100% - #{$albumArtWidth});
+menu {
+	align-items: center;
+	display: flex;
 
-	&::-moz-range-thumb {
-		background: #3470A2;
+	button {
+		appearance: none;
+		background: transparent;
 		border: 0;
-		border-radius: 50%;
-		cursor: col-resize;
+		padding: 0 6px;
+
+		&.off {
+			opacity: 0.2;
+		}
+	}
+
+	// seek/progress bar
+	input {
+		appearance: none;
+		background: transparent;
 		height: 9px;
-		width: 9px;
+		left: $albumArtWidth;
+		margin: 0;
+		position: absolute;
+		right: 0;
+		top: -3px;
+		width: calc(100% - #{$albumArtWidth});
+
+		&::-moz-range-thumb {
+			background: #3470A2;
+			border: 0;
+			border-radius: 50%;
+			cursor: col-resize;
+			height: 9px;
+			width: 9px;
+		}
+
+		&::-moz-range-track {
+			background: #e5e5e5;
+		}
+
+		&::-moz-range-progress {
+			background: #3470A2;
+		}
 	}
 
-	&::-moz-range-track {
-		background: #e5e5e5;
+	li:first-child {
+		margin-right: 12px;
 	}
 
-	&::-moz-range-progress {
-		background: #3470A2;
+	li:last-child {
+		margin-left: 12px;
 	}
 }
 
 section {
 	align-items: center;
 	display: flex;
+	justify-content: space-between;
 	margin-top: 24px;
 	position: relative;
+}
+
+#elapsed-time {
+	color: #3470A2;
+	font-size: 24px;
+	font-variation-settings: 'wght' 300;
+	margin-right: 24px;
 }
 </style>
