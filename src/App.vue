@@ -6,34 +6,7 @@ https://muhammadatt.medium.com/building-an-mp3-audio-player-in-vue-js-c588420725
 	<main class="rounded--all drop-shadow">
 		<div id="media-library">
 			<BaseNav />
-
-			<section id="playlist" class="bg--white rounded--all">
-				<header>
-					<h1>Another Late Night</h1>
-					<p>70 songs (5:32:14)</p>
-				</header>
-
-				<table>
-					<thead>
-						<tr>
-							<th>#</th>
-							<th>Title</th>
-							<th>Album</th>
-							<th>Last Played</th>
-							<th>Duration</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr>
-							<th>1</th>
-							<td>Hard to Stay Cool</td>
-							<td>Hard to Stay Cool</td>
-							<td>Dec 11, 2021</td>
-							<td>5:34</td>
-						</tr>
-					</tbody>
-				</table>
-			</section>
+			<MainPanel />
 		</div>
 
 		<section id="now-playing" class="bg--white rounded--all drop-shadow">
@@ -84,12 +57,14 @@ https://muhammadatt.medium.com/building-an-mp3-audio-player-in-vue-js-c588420725
 
 <script>
 import BaseNav from '@/components/BaseNav.vue';
+import MainPanel from '@/components/MainPanel.vue';
 
 export default {
 	components: {
 		BaseNav,
+		MainPanel
 	},
-	
+
 	data() {
 		return {
 			audioDuration: 100,
