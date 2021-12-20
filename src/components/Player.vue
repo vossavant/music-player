@@ -93,7 +93,6 @@ export default {
 			audioFile: "http://localhost:8080/test.flac",
 			isPlaying: false,
 			playbackTime: 0,
-			playButtonText: "Play",
 			repeatOn: false,
 			shuffleOn: false,
 			trackType: null,
@@ -169,19 +168,17 @@ export default {
 			}
 		},
 
-		//Playback listener function runs every 100ms while audio is playing
+		// runs every 100ms while audio is playing
 		playbackListener() {
 			let player = this.$refs.player;
 			//Sync local 'playbackTime' var to player.currentTime and update global state
 			this.playbackTime = player.currentTime;
 
 			//console.log("update: " + player.currentTime);
-			//Add listeners for audio pause and audio end events
 			player.addEventListener("ended", this.endListener);
 			player.addEventListener("pause", this.pauseListener);
 		},
 
-		//Function to run when audio is paused by user
 		pauseListener() {
 			this.isPlaying = false;
 			this.listenerActive = false;
@@ -189,11 +186,11 @@ export default {
 		},
 
 		rewindAudio() {
-			alert('rewind 10s...');
+			this.playbackTime -= 10
 		},
 
 		forwardAudio() {
-			alert('forward 10s...');
+			this.playbackTime += 10
 		},
 		
 		skipNext() {
@@ -222,14 +219,14 @@ export default {
 			}
 		},
 
-		//Function to run when audio play reaches the end of file
+		// when playback ends
 		endListener() {
 			this.isPlaying = false;
 			this.listenerActive = false;
 			this.cleanupListeners();
 		},
 
-		//Remove listeners after audio play stops
+		// remove listeners after audio play stops
 		cleanupListeners() {
 			let player = this.$refs.player;
 			player.removeEventListener("freqtimeupdate", this.playbackListener);
@@ -238,21 +235,17 @@ export default {
 		},
 
 		toggleAudio() {
-			// let player = document.getElementById('player');
 			let player = this.$refs.player;
 
 			if (player.paused) {
-				this.playButtonText = "Pause";
 				this.isPlaying = true;
 				player.play();
 			} else {
-				this.playButtonText = "Play";
 				this.isPlaying = false;
 				player.pause();
 			}
 		},
 
-		//Show the total duration of audio file
 		totalTime() {
 			let player = this.$refs.player;
 
