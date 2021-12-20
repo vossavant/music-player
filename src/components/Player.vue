@@ -60,8 +60,9 @@
 				</button>
 			</li>
 			<li>
-				<button :class="{ 'off' : !repeatOn }" @click="toggleRepeat">
-					<BaseIcon icon="repeat" color="#000000" size="24" />
+				<button :class="{ 'off' : repeatOn === false }" @click="toggleRepeat">
+					<BaseIcon v-if="repeatOn !== 'track'" icon="repeat" color="#000000" size="24" />
+					<BaseIcon v-if="repeatOn === 'track'" icon="repeat_one" color="#000000" size="24" />
 				</button>
 				<input
 					v-model="playbackTime"
@@ -206,8 +207,10 @@ export default {
 		toggleRepeat() {
 			if (this.repeatOn === false) {
 				this.repeatOn = true
-			} else {
+			} else if (this.repeatOn === 'track') {
 				this.repeatOn = false;
+			} else {
+				this.repeatOn = 'track';
 			}
 		},
 		
