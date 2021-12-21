@@ -8,7 +8,7 @@
 				id="player"
 				ref="player"
 				preload="metadata"
-				:src="audioFile"
+				:src="playlist[activeTrack]"
 			>
 				Your browser does not support the <code>audio</code> element.
 			</audio>
@@ -88,11 +88,16 @@ export default {
 
 	data() {
 		return {
+			activeTrack: 0,
 			audioDuration: 100,
 			audioLoaded: false,
-			audioFile: "http://localhost:8080/test.flac",
 			isPlaying: false,
 			playbackTime: 0,
+			playlist: [
+				"http://localhost:8080/test.flac",
+				"http://localhost:8080/test-2.flac",
+				"http://localhost:8080/test-3.flac",
+			],
 			repeatOn: false,
 			shuffleOn: false,
 			trackType: null,
@@ -116,7 +121,7 @@ export default {
 			var jsmediatags = require("jsmediatags");
 			let self = this;
 
-			jsmediatags.read(this.audioFile, {
+			jsmediatags.read(this.playlist[this.activeTrack], {
 				onSuccess: function (result) {
 					console.log(result);
 					self.trackType = result.type;
@@ -124,14 +129,18 @@ export default {
 					self.trackArtist = result.tags.artist;
 					self.trackTitle = result.tags.title;
 
-					const { data, format } = result.tags.picture;
-					let base64String = "";
-					for (let i = 0; i < data.length; i++) {
-						base64String += String.fromCharCode(data[i]);
+					if (result.tags.picture) {
+						const { data, format } = result.tags.picture;
+						let base64String = "";
+						for (let i = 0; i < data.length; i++) {
+							base64String += String.fromCharCode(data[i]);
+						}
+						self.trackPicture = `data:${data.format};base64,${window.btoa(
+							base64String
+						)}`;
+					} else {
+						self.trackPicture = require("@/assets/missing.svg")
 					}
-					self.trackPicture = `data:${data.format};base64,${window.btoa(
-						base64String
-					)}`;
 				},
 				onError: function (error) {
 					console.log(":(", error.type, error.info);
@@ -194,11 +203,11 @@ export default {
 		},
 		
 		skipNext() {
-			alert('skip to next...');
+			this.activeTrack++;
 		},
 
 		skipPrev() {
-			alert('skip to prev...');
+			this.activeTrack--;
 		},
 		
 		toggleRepeat() {
