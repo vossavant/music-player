@@ -74,7 +74,13 @@
 				/>
 			</li>
 		</menu>
-		<p id="elapsed-time">{{ elapsedTime() }}</p>
+		<p 
+			@click="toggleElapsedTimeDisplay" 
+			id="elapsed-time"
+			title="Toggle time display" 
+		>
+			{{ elapsedTime() }}
+		</p>
 	</section>
 </template>
 
@@ -91,6 +97,7 @@ export default {
 			activeTrack: 0,
 			audioDuration: 100,
 			audioLoaded: false,
+			elapsedTimeIsCountingDown: false,
 			isPlaying: false,
 			playbackTime: 0,
 			playlist: [
@@ -171,10 +178,18 @@ export default {
 			let player = this.$refs.player;
 
 			if (player) {
-				return this.convertTime(player.currentTime);
+				if (this.elapsedTimeIsCountingDown) {
+					return "-" + this.convertTime(player.duration - player.currentTime);
+				} else {
+					return this.convertTime(player.currentTime);
+				}
 			} else {
 				return "00:00";
 			}
+		},
+
+		toggleElapsedTimeDisplay() {
+			this.elapsedTimeIsCountingDown = !this.elapsedTimeIsCountingDown;
 		},
 
 		// runs every 100ms while audio is playing
@@ -415,6 +430,7 @@ section {
 
 #elapsed-time {
 	color: #3470A2;
+	cursor: pointer;
 	font-size: 24px;
 	font-variation-settings: 'wght' 300;
 	margin-right: 24px;
