@@ -27,53 +27,25 @@
 			</header>
 		</article>
 
-		<menu>
-			<li>
-				<button :class="{ 'off' : !shuffleOn }" @click="toggleShuffle">
-					<BaseIcon icon="shuffle" color="#000000" size="24" />
-				</button>
-			</li>
-			<li>
-				<button @click="skipPrev">
-					<BaseIcon icon="skip_previous" color="#000000" size="24" />
-				</button>
-			</li>
-			<li>
-				<button @click="rewindAudio">
-					<BaseIcon icon="fast_rewind" color="#000000" size="24" />
-				</button>
-			</li>
-			<li>
-				<button @click="toggleAudio">
-					<BaseIcon v-if="isPlaying" icon="pause_circle_outline" color="#000000" size="36" />
-					<BaseIcon v-else icon="play_circle_outline" color="#000000" size="36" />
-				</button>
-			</li>
-			<li>
-				<button @click="forwardAudio">
-					<BaseIcon icon="fast_forward" color="#000000" size="24" />
-				</button>
-			</li>
-			<li>
-				<button @click="skipNext">
-					<BaseIcon icon="skip_next" color="#000000" size="24" />
-				</button>
-			</li>
-			<li>
-				<button :class="{ 'off' : repeatOn === false }" @click="toggleRepeat">
-					<BaseIcon v-if="repeatOn !== 'track'" icon="repeat" color="#000000" size="24" />
-					<BaseIcon v-if="repeatOn === 'track'" icon="repeat_one" color="#000000" size="24" />
-				</button>
-				<input
-					v-model="playbackTime"
-					type="range"
-					min="0"
-					:max="audioDuration"
-					id="playback-position"
-					name="position"
-				/>
-			</li>
-		</menu>
+		<PlayerMenu 
+			:isPlaying="isPlaying"
+			:repeatOn="repeatOn"
+			:shuffleOn="shuffleOn"
+			@activeTrack="skipTrack($event)" 
+			@playbackTime="adjustPlaybackTime($event)"
+			@togglePlay="togglePlay()"
+			@toggleRepeat="toggleRepeat()"
+			@toggleShuffle="toggleShuffle()"
+		/>
+
+		<input
+			v-model="playbackTime"
+			type="range"
+			min="0"
+			:max="audioDuration"
+			id="playback-position"
+			name="position"
+		/>
 		<p 
 			@click="toggleElapsedTimeDisplay" 
 			id="elapsed-time"
@@ -85,11 +57,11 @@
 </template>
 
 <script>
-import BaseIcon from '@/components/BaseIcon.vue';
+import PlayerMenu from '@/components/PlayerMenu.vue';
 
 export default {
 	components: {
-		BaseIcon,
+		PlayerMenu,
 	},
 
 	data() {
@@ -166,6 +138,50 @@ export default {
 			// 	});
 		},
 
+		adjustPlaybackTime(seconds) {
+			this.playbackTime += seconds;
+		},
+
+		skipTrack(n) {
+			this.playbackTime = 0;
+			this.isPlaying = false;
+			this.activeTrack += n;
+
+			if (this.activeTrack < 0) {
+				this.activeTrack = 0;
+			}
+		},
+
+		togglePlay() {
+			let player = this.$refs.player;
+
+			if (this.isPlaying) {
+				player.pause();
+			} else {
+				player.play();
+			}
+			
+			this.isPlaying = !this.isPlaying;
+		},
+
+		toggleRepeat() {
+			if (this.repeatOn === false) {
+				this.repeatOn = true
+			} else if (this.repeatOn === 'track') {
+				this.repeatOn = false;
+			} else {
+				this.repeatOn = 'track';
+			}
+		},
+
+		toggleShuffle() {
+			if (this.shuffleOn === false) {
+				this.shuffleOn = true
+			} else {
+				this.shuffleOn = false;
+			}
+		},
+
 		//Convert audio current time from seconds to min:sec display
 		convertTime(seconds) {
 			const FORMAT = (val) => `0${Math.floor(val)}`.slice(-2);
@@ -209,40 +225,6 @@ export default {
 			this.cleanupListeners();
 		},
 
-		rewindAudio() {
-			this.playbackTime -= 10
-		},
-
-		forwardAudio() {
-			this.playbackTime += 10
-		},
-		
-		skipNext() {
-			this.activeTrack++;
-		},
-
-		skipPrev() {
-			this.activeTrack--;
-		},
-		
-		toggleRepeat() {
-			if (this.repeatOn === false) {
-				this.repeatOn = true
-			} else if (this.repeatOn === 'track') {
-				this.repeatOn = false;
-			} else {
-				this.repeatOn = 'track';
-			}
-		},
-		
-		toggleShuffle() {
-			if (this.shuffleOn === false) {
-				this.shuffleOn = true
-			} else {
-				this.shuffleOn = false;
-			}
-		},
-
 		// when playback ends
 		endListener() {
 			this.isPlaying = false;
@@ -256,18 +238,6 @@ export default {
 			player.removeEventListener("freqtimeupdate", this.playbackListener);
 			player.removeEventListener("ended", this.endListener);
 			player.removeEventListener("pause", this.pauseListener);
-		},
-
-		toggleAudio() {
-			let player = this.$refs.player;
-
-			if (player.paused) {
-				this.isPlaying = true;
-				player.play();
-			} else {
-				this.isPlaying = false;
-				player.pause();
-			}
 		},
 
 		totalTime() {
@@ -366,57 +336,33 @@ img {
 	width: $albumArtWidth;
 }
 
-menu {
-	align-items: center;
-	display: flex;
+// seek/progress bar
+input {
+	appearance: none;
+	background: transparent;
+	height: 9px;
+	left: $albumArtWidth;
+	margin: 0;
+	position: absolute;
+	right: 0;
+	top: -3px;
+	width: calc(100% - #{$albumArtWidth});
 
-	button {
-		appearance: none;
-		background: transparent;
+	&::-moz-range-thumb {
+		background: #3470A2;
 		border: 0;
-		padding: 0 6px;
-
-		&.off {
-			opacity: 0.2;
-		}
-	}
-
-	// seek/progress bar
-	input {
-		appearance: none;
-		background: transparent;
+		border-radius: 50%;
+		cursor: col-resize;
 		height: 9px;
-		left: $albumArtWidth;
-		margin: 0;
-		position: absolute;
-		right: 0;
-		top: -3px;
-		width: calc(100% - #{$albumArtWidth});
-
-		&::-moz-range-thumb {
-			background: #3470A2;
-			border: 0;
-			border-radius: 50%;
-			cursor: col-resize;
-			height: 9px;
-			width: 9px;
-		}
-
-		&::-moz-range-track {
-			background: #e5e5e5;
-		}
-
-		&::-moz-range-progress {
-			background: #3470A2;
-		}
+		width: 9px;
 	}
 
-	li:first-child {
-		margin-right: 12px;
+	&::-moz-range-track {
+		background: #e5e5e5;
 	}
 
-	li:last-child {
-		margin-left: 12px;
+	&::-moz-range-progress {
+		background: #3470A2;
 	}
 }
 
