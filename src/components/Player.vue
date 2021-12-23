@@ -232,25 +232,8 @@ export default {
 	},
 
 	watch: {
-		// isPlaying(newValue, oldValue) {
-		// 	console.log('is playing (new, old)? ' + newValue + ', ' + oldValue)
-		// 	if (this.isPlaying) {
-		// 		console.log("playback started");
-				
-		// 		// prevent starting multiple listeners at the same time
-		// 		// if (!this.listenerActive) {
-		// 		// 	this.listenerActive = true;
-		// 		// 	player.addEventListener(
-		// 		// 		"freqtimeupdate",
-		// 		// 		this.playbackListener
-		// 		// 	);
-		// 		// }
-		// 	}
-		// },
-
 		playbackTime(newValue, oldValue) {
 			// update current audio position when user drags progress slider or seeks
-			// console.log('playback time (new, old) ' +newValue + ', ' + oldValue)
 			let player = this.$refs.player;
 			let diff = Math.abs(this.playbackTime - player.currentTime);
 
