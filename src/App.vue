@@ -6,10 +6,10 @@ https://muhammadatt.medium.com/building-an-mp3-audio-player-in-vue-js-c588420725
 	<main class="rounded--all drop-shadow">
 		<div id="media-library">
 			<BaseNav />
-			<MainPanel />
+			<MainPanel @playlistTrackNumber="loadTrack($event)" />
 		</div>
 
-		<Player />
+		<Player :activeTrack="activeTrack" />
 	</main>
 </template>
 
@@ -23,6 +23,18 @@ export default {
 		BaseNav,
 		MainPanel,
 		Player
+	},
+
+	data() {
+		return {
+			activeTrack: 0
+		}
+	},
+
+	methods: {
+		loadTrack(track) {
+			this.activeTrack = track
+		}
 	},
 };
 </script>

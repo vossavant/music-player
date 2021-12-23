@@ -64,9 +64,15 @@ export default {
 		PlayerMenu,
 	},
 
+	props: {
+		activeTrack: {
+			type: Number,
+			default: 0
+		},
+	},
+
 	data() {
 		return {
-			activeTrack: 0,
 			audioDuration: 0,
 			audioLoaded: false,
 			elapsedTimeIsCountingDown: false,

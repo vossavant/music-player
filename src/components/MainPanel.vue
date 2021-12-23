@@ -18,33 +18,47 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr>
+				<tr @click="loadTrack(0)">
 					<th>1</th>
 					<td>
 						<span>
-							Hard to Stay Cool
+							Vecchio e il bambino
 						</span>
 						<span>
-							Cedric Burnside
+							Carla Bruni
 						</span>
 					</td>
-					<td>Hard to Stay Cool</td>
+					<td>Comme si de rien n'etait</td>
 					<td>Dec 11, 2021</td>
-					<td>5:34</td>
+					<td>3:24</td>
 				</tr>
-				<tr>
+				<tr @click="loadTrack(1)">
 					<th>2</th>
 					<td>
 						<span>
-							No Wrong
+							Rococo
 						</span>
 						<span>
-							Bahamas
+							Arcade Fire
 						</span>
 					</td>
-					<td>Earthtones</td>
+					<td>The Suburbs</td>
 					<td>Dec 11, 2021</td>
-					<td>3:39</td>
+					<td>3:56</td>
+				</tr>
+				<tr @click="loadTrack(2)">
+					<th>3</th>
+					<td>
+						<span>
+							Benny and the Jets
+						</span>
+						<span>
+							Elton John
+						</span>
+					</td>
+					<td>Greatest Hits 1970-2002 [Disc 1]</td>
+					<td>Dec 11, 2021</td>
+					<td>5:09</td>
 				</tr>
 			</tbody>
 		</table>
@@ -56,6 +70,12 @@ import BaseIcon from '@/components/BaseIcon.vue';
 export default {
 	components: {
 		BaseIcon,
+	},
+
+	methods: {
+		loadTrack(track) {
+			this.$emit('playlistTrackNumber', track);
+		}
 	},
 };
 </script>
@@ -89,6 +109,10 @@ table {
 th {
 	font-variation-settings: 'wght' 500;
 	text-align: left;
+
+	&:first-of-type {
+		padding-left: 10px;
+	}
 }
 
 tbody {
