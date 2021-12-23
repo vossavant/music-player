@@ -67,7 +67,7 @@ export default {
 	data() {
 		return {
 			activeTrack: 0,
-			audioDuration: 100,
+			audioDuration: 0,
 			audioLoaded: false,
 			elapsedTimeIsCountingDown: false,
 			isPlaying: false,
@@ -88,8 +88,7 @@ export default {
 	},
 
 	methods: {
-		// Set the range slider max value equal to audio duration
-		initSlider() {
+		initProgressBar() {
 			let player = this.$refs.player;
 			if (player) {
 				this.audioDuration = Math.round(player.duration);
@@ -143,8 +142,8 @@ export default {
 		},
 
 		skipTrack(n) {
+			console.log('track skipped... playing? ' + this.isPlaying);
 			this.playbackTime = 0;
-			this.isPlaying = false;
 			this.activeTrack += n;
 
 			if (this.activeTrack < 0) {
@@ -211,7 +210,6 @@ export default {
 		// runs every 100ms while audio is playing
 		playbackListener() {
 			let player = this.$refs.player;
-			//Sync local 'playbackTime' var to player.currentTime and update global state
 			this.playbackTime = player.currentTime;
 
 			//console.log("update: " + player.currentTime);
@@ -220,6 +218,7 @@ export default {
 		},
 
 		pauseListener() {
+			console.log('playback paused');
 			this.isPlaying = false;
 			this.listenerActive = false;
 			this.cleanupListeners();
@@ -227,6 +226,7 @@ export default {
 
 		// when playback ends
 		endListener() {
+			console.log('playback ended');
 			this.isPlaying = false;
 			this.listenerActive = false;
 			this.cleanupListeners();
@@ -251,53 +251,56 @@ export default {
 		},
 	},
 
-	mounted: function () {
-		// nextTick code will run only after the entire view has been rendered
-		this.$nextTick(function () {
-			var player = this.$refs.player;
-			//Wait for audio to load, then run initSlider() to get audio duration and set the max value of our slider
-			// "loademetadata" Event https://www.w3schools.com/tags/av_event_loadedmetadata.asp
-			player.addEventListener(
-				"loadedmetadata",
-				function () {
-					this.getID3tags();
-					this.initSlider();
-				}.bind(this)
-			);
-			// "canplay" HTML Event lets us know audio is ready for play https://www.w3schools.com/tags/av_event_canplay.asp
-			player.addEventListener(
-				"canplay",
-				function () {
-					this.audioLoaded = true;
-				}.bind(this)
-			);
-
-			//Wait for audio to begin play, then start playback listener function
-			this.$watch("isPlaying", function () {
-				if (this.isPlaying) {
-					let player = this.$refs.player;
-					this.initSlider();
-					//console.log("Audio playback started.");
-					//prevent starting multiple listeners at the same time
-					if (!this.listenerActive) {
-						this.listenerActive = true;
-						player.addEventListener(
-							"freqtimeupdate",
-							this.playbackListener
-						);
-					}
-				}
-			});
-			//Update current audio position when user drags progress slider
-			this.$watch("playbackTime", function () {
+	watch: {
+		isPlaying(newValue, oldValue) {
+			console.log('new watcher... ' + newValue + ', ' + oldValue)
+			if (this.isPlaying) {
 				let player = this.$refs.player;
-				let diff = Math.abs(this.playbackTime - player.currentTime);
-
-				//Throttle synchronization to prevent infinite loop between playback listener and this watcher
-				if (diff > 0.01) {
-					player.currentTime = this.playbackTime;
+				this.initProgressBar();
+				//console.log("Audio playback started.");
+				//prevent starting multiple listeners at the same time
+				if (!this.listenerActive) {
+					this.listenerActive = true;
+					player.addEventListener(
+						"freqtimeupdate",
+						this.playbackListener
+					);
 				}
-			});
+			}
+		},
+
+		playbackTime(newValue, oldValue) {
+			console.log('playback time watcher... ' +newValue + ', ' + oldValue)
+			// update current audio position when user drags progress slider
+			let player = this.$refs.player;
+			let diff = Math.abs(this.playbackTime - player.currentTime);
+
+			// throttle synchronization to prevent infinite loop between playback listener and this watcher
+			if (diff > 0.01) {
+				player.currentTime = this.playbackTime;
+			}
+		}
+	},
+
+	mounted: function () {
+		/**
+		 * nextTick code will run only after the entire view has been rendered
+		 * https://vuejs.org/v2/api/#mounted
+		 */
+		// 
+		this.$nextTick(function () {
+			let player = this.$refs.player;
+
+			player.onloadedmetadata = function() {
+				console.log('>> audio meta loaded');
+				this.getID3tags();
+				this.initProgressBar();
+			}.bind(this);
+
+			player.oncanplay = function() {
+				console.log('>> audio can play');
+				this.audioLoaded = true;
+			}.bind(this);
 		});
 	},
 };
@@ -372,6 +375,7 @@ section {
 	display: flex;
 	justify-content: space-between;
 	margin-top: 24px;
+	min-height: $albumArtWidth;
 	position: relative;
 }
 
