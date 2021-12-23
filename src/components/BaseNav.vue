@@ -84,6 +84,10 @@ nav {
 	margin-right: 24px;
 	width: 168px;
 
+	button {
+		margin-top: 32px;
+	}
+
 	h3 {
 		color: #3470A2;
 		font-variation-settings: 'wght' 500;
