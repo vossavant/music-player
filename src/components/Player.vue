@@ -124,17 +124,6 @@ export default {
 					console.log(":(", error.type, error.info);
 				},
 			});
-
-			// new jsmediatags.Reader("http://localhost:8081/test.flac")
-			// 	.setTagsToRead(["title", "artist"])
-			// 	.read({
-			// 		onSuccess: function (tag) {
-			// 			console.log(tag);
-			// 		},
-			// 		onError: function (error) {
-			// 			console.log(":(", error.type, error.info);
-			// 		},
-			// 	});
 		},
 
 		adjustPlaybackTime(seconds) {
@@ -181,8 +170,7 @@ export default {
 			}
 		},
 
-		//Convert audio current time from seconds to min:sec display
-		convertTime(seconds) {
+		convertTimeToMinsSecs(seconds) {
 			const FORMAT = (val) => `0${Math.floor(val)}`.slice(-2);
 			let minutes = (seconds % 3600) / 60;
 
@@ -194,9 +182,9 @@ export default {
 
 			if (player) {
 				if (this.elapsedTimeIsCountingDown) {
-					return "-" + this.convertTime(player.duration - player.currentTime);
+					return "-" + this.convertTimeToMinsSecs(player.duration - player.currentTime);
 				} else {
-					return this.convertTime(player.currentTime);
+					return this.convertTimeToMinsSecs(player.currentTime);
 				}
 			} else {
 				return "00:00";
@@ -207,20 +195,13 @@ export default {
 			this.elapsedTimeIsCountingDown = !this.elapsedTimeIsCountingDown;
 		},
 
-		// runs every 100ms while audio is playing
 		playbackListener() {
-			let player = this.$refs.player;
-			this.playbackTime = player.currentTime;
-
-			//console.log("update: " + player.currentTime);
-			player.addEventListener("ended", this.endListener);
-			player.addEventListener("pause", this.pauseListener);
+			this.playbackTime = this.$refs.player.currentTime;
 		},
 
 		pauseListener() {
 			console.log('playback paused');
 			this.isPlaying = false;
-			this.listenerActive = false;
 			this.cleanupListeners();
 		},
 
@@ -228,15 +209,14 @@ export default {
 		endListener() {
 			console.log('playback ended');
 			this.isPlaying = false;
-			this.listenerActive = false;
 			this.cleanupListeners();
+			player.removeEventListener("ended", this.endListener);
 		},
 
 		// remove listeners after audio play stops
 		cleanupListeners() {
 			let player = this.$refs.player;
 			player.removeEventListener("freqtimeupdate", this.playbackListener);
-			player.removeEventListener("ended", this.endListener);
 			player.removeEventListener("pause", this.pauseListener);
 		},
 
@@ -244,7 +224,7 @@ export default {
 			let player = this.$refs.player;
 
 			if (player) {
-				return this.convertTime(player.duration);
+				return this.convertTimeToMinsSecs(player.duration);
 			} else {
 				return "00:00";
 			}
@@ -252,30 +232,29 @@ export default {
 	},
 
 	watch: {
-		isPlaying(newValue, oldValue) {
-			console.log('new watcher... ' + newValue + ', ' + oldValue)
-			if (this.isPlaying) {
-				let player = this.$refs.player;
-				this.initProgressBar();
-				//console.log("Audio playback started.");
-				//prevent starting multiple listeners at the same time
-				if (!this.listenerActive) {
-					this.listenerActive = true;
-					player.addEventListener(
-						"freqtimeupdate",
-						this.playbackListener
-					);
-				}
-			}
-		},
+		// isPlaying(newValue, oldValue) {
+		// 	console.log('is playing (new, old)? ' + newValue + ', ' + oldValue)
+		// 	if (this.isPlaying) {
+		// 		console.log("playback started");
+				
+		// 		// prevent starting multiple listeners at the same time
+		// 		// if (!this.listenerActive) {
+		// 		// 	this.listenerActive = true;
+		// 		// 	player.addEventListener(
+		// 		// 		"freqtimeupdate",
+		// 		// 		this.playbackListener
+		// 		// 	);
+		// 		// }
+		// 	}
+		// },
 
 		playbackTime(newValue, oldValue) {
-			console.log('playback time watcher... ' +newValue + ', ' + oldValue)
-			// update current audio position when user drags progress slider
+			// update current audio position when user drags progress slider or seeks
+			// console.log('playback time (new, old) ' +newValue + ', ' + oldValue)
 			let player = this.$refs.player;
 			let diff = Math.abs(this.playbackTime - player.currentTime);
 
-			// throttle synchronization to prevent infinite loop between playback listener and this watcher
+			// throttle sync to prevent infinite loop between playback listener and this watcher
 			if (diff > 0.01) {
 				player.currentTime = this.playbackTime;
 			}
@@ -300,7 +279,18 @@ export default {
 			player.oncanplay = function() {
 				console.log('>> audio can play');
 				this.audioLoaded = true;
+				if (this.isPlaying) {
+					player.play();
+				}
 			}.bind(this);
+
+			player.onplay = function() {
+				console.log('>> playback started');
+				player.addEventListener("freqtimeupdate",this.playbackListener);
+				player.addEventListener("ended", this.endListener);
+				player.addEventListener("pause", this.pauseListener);
+			}.bind(this);
+
 		});
 	},
 };
