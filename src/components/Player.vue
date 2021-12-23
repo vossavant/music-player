@@ -333,6 +333,7 @@ h3 {
 img {
 	border-bottom-right-radius: 0;
 	border-top-right-radius: 0;
+	height: $albumArtWidth;
 	width: $albumArtWidth;
 }
 

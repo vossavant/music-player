@@ -129,6 +129,9 @@ $albumArtWidth: 72px;
 menu {
 	align-items: center;
 	display: flex;
+	left: 50%;
+	margin-left: -144px;
+	position: absolute;
 
 	button {
 		appearance: none;
