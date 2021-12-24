@@ -6,7 +6,7 @@
 			</button>
 		</li>
 		<li>
-			<button @click="skipPrev">
+			<button :disabled="isFirstTrack" @click="skipPrev">
 				<BaseIcon icon="skip_previous" color="#000000" size="24" />
 			</button>
 		</li>
@@ -37,7 +37,7 @@
 			</button>
 		</li>
 		<li>
-			<button @click="skipNext">
+			<button :disabled="isLastTrack" @click="skipNext">
 				<BaseIcon icon="skip_next" color="#000000" size="24" />
 			</button>
 		</li>
@@ -69,9 +69,19 @@ export default {
 	},
 
 	props: {
+		activeTrack: {
+			type: Number,
+			default: 0
+		},
+
 		isPlaying: {
 			type: Boolean,
 			default: false
+		},
+
+		playlistSize: {
+			type: Number,
+			default: 0
 		},
 
 		repeatOn: {
@@ -88,6 +98,16 @@ export default {
 	data() {
 		return {
 
+		}
+	},
+
+	computed: {
+		isFirstTrack() {
+			return this.activeTrack === 0
+		},
+
+		isLastTrack() {
+			return this.playlistSize - 1 - this.activeTrack === 0
 		}
 	},
 
@@ -139,8 +159,13 @@ menu {
 		border: 0;
 		padding: 0 6px;
 
+		&:disabled,
 		&.off {
 			opacity: 0.2;
+		}
+
+		&:disabled {
+			cursor: not-allowed;
 		}
 	}
 

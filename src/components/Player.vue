@@ -28,7 +28,9 @@
 		</article>
 
 		<PlayerMenu 
+			:activeTrack="activeTrack"
 			:isPlaying="isPlaying"
+			:playlistSize="playlistSize"
 			:repeatOn="repeatOn"
 			:shuffleOn="shuffleOn"
 			@activeTrack="skipTrack($event)" 
@@ -93,6 +95,12 @@ export default {
 		};
 	},
 
+	computed: {
+		playlistSize() {
+			return this.playlist.length
+		}
+	},
+
 	methods: {
 		initProgressBar() {
 			let player = this.$refs.player;
@@ -143,6 +151,10 @@ export default {
 
 			if (this.activeTrack < 0) {
 				this.activeTrack = 0;
+			}
+
+			if (this.activeTrack > (this.playlistSize - 1)) {
+				this.activeTrack = this.playlistSize - 1
 			}
 		},
 
