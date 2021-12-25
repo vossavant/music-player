@@ -8,7 +8,7 @@
 				id="player"
 				ref="player"
 				preload="metadata"
-				:src="playlist[activeTrack]"
+				:src="playlist[currentTrack]"
 			>
 				Your browser does not support the <code>audio</code> element.
 			</audio>
@@ -28,11 +28,8 @@
 		</article>
 
 		<PlayerMenu 
-			:activeTrack="activeTrack"
-			:playlistSize="playlistSize"
 			:repeatOn="repeatOn"
 			:shuffleOn="shuffleOn"
-			@activeTrack="skipTrack($event)" 
 			@playbackTime="adjustPlaybackTime($event)"
 			@toggleRepeat="toggleRepeat()"
 			@toggleShuffle="toggleShuffle()"
@@ -65,13 +62,6 @@ export default {
 		PlayerMenu,
 	},
 
-	props: {
-		activeTrack: {
-			type: Number,
-			default: 0
-		},
-	},
-
 	data() {
 		return {
 			audioDuration: 0,
@@ -94,11 +84,7 @@ export default {
 	},
 
 	computed: {
-		...mapState(['isPlaying']),
-
-		playlistSize() {
-			return this.playlist.length
-		}
+		...mapState(['currentTrack', 'isPlaying']),
 	},
 
 	methods: {
@@ -113,7 +99,7 @@ export default {
 			var jsmediatags = require("jsmediatags");
 			let self = this;
 
-			jsmediatags.read(this.playlist[this.activeTrack], {
+			jsmediatags.read(this.playlist[this.currentTrack], {
 				onSuccess: function (result) {
 					console.log(result);
 					self.trackType = result.type;
@@ -142,24 +128,6 @@ export default {
 
 		adjustPlaybackTime(seconds) {
 			this.playbackTime += seconds;
-		},
-
-		skipTrack(n) {
-			console.log('track skipped... playing? ' + this.isPlaying);
-			this.playbackTime = 0;
-			this.activeTrack += n;
-
-			if (this.activeTrack < 0) {
-				this.activeTrack = 0;
-			}
-
-			if (this.activeTrack > (this.playlistSize - 1)) {
-				this.activeTrack = this.playlistSize - 1
-			}
-		},
-
-		togglePlay() {
-			
 		},
 
 		toggleRepeat() {
@@ -292,6 +260,8 @@ export default {
 				player.addEventListener("ended", this.endListener);
 				player.addEventListener("pause", this.pauseListener);
 			}.bind(this);
+
+			this.$store.commit("setPlaylistSize", this.playlist.length);
 
 		});
 	},

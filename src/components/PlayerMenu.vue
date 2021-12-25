@@ -70,16 +70,6 @@ export default {
 	},
 
 	props: {
-		activeTrack: {
-			type: Number,
-			default: 0
-		},
-
-		playlistSize: {
-			type: Number,
-			default: 0
-		},
-
 		repeatOn: {
 			type: [Boolean, String],
 			default: false
@@ -98,14 +88,14 @@ export default {
 	},
 
 	computed: {
-		...mapState(['isPlaying']),
+		...mapState(['currentTrack', 'isPlaying', 'playlistSize']),
 
 		isFirstTrack() {
-			return this.activeTrack === 0
+			return this.currentTrack === 0
 		},
 
 		isLastTrack() {
-			return this.playlistSize - 1 - this.activeTrack === 0
+			return this.playlistSize - 1 - this.currentTrack === 0
 		}
 	},
 
@@ -119,11 +109,11 @@ export default {
 		},
 		
 		skipNext() {
-			this.$emit('activeTrack', 1);
+			this.$store.commit("changeTrack", 1);
 		},
 
 		skipPrev() {
-			this.$emit('activeTrack', -1);
+			this.$store.commit("changeTrack", -1);
 		},
 
 		togglePlay() {
