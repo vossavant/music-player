@@ -74,7 +74,7 @@ export default {
 
 	methods: {
 		loadTrack(track) {
-			this.$emit('playlistTrackNumber', track);
+			this.$store.commit('loadTrack', track);
 		}
 	},
 };

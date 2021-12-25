@@ -11,7 +11,11 @@ export default new Vuex.Store({
 	},
 
 	mutations: {
-		changeTrack(state, n) {
+		loadTrack(state, n) {
+			state.currentTrack = n
+		},
+
+		skipTrack(state, n) {
 			state.currentTrack += n;
 
 			if (state.currentTrack < 0) {

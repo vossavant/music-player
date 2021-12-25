@@ -109,11 +109,11 @@ export default {
 		},
 		
 		skipNext() {
-			this.$store.commit("changeTrack", 1);
+			this.$store.commit("skipTrack", 1);
 		},
 
 		skipPrev() {
-			this.$store.commit("changeTrack", -1);
+			this.$store.commit("skipTrack", -1);
 		},
 
 		togglePlay() {
