@@ -29,13 +29,11 @@
 
 		<PlayerMenu 
 			:activeTrack="activeTrack"
-			:isPlaying="isPlaying"
 			:playlistSize="playlistSize"
 			:repeatOn="repeatOn"
 			:shuffleOn="shuffleOn"
 			@activeTrack="skipTrack($event)" 
 			@playbackTime="adjustPlaybackTime($event)"
-			@togglePlay="togglePlay()"
 			@toggleRepeat="toggleRepeat()"
 			@toggleShuffle="toggleShuffle()"
 		/>
@@ -60,6 +58,7 @@
 
 <script>
 import PlayerMenu from '@/components/PlayerMenu.vue';
+import { mapState } from 'vuex';
 
 export default {
 	components: {
@@ -78,7 +77,6 @@ export default {
 			audioDuration: 0,
 			audioLoaded: false,
 			elapsedTimeIsCountingDown: false,
-			isPlaying: false,
 			playbackTime: 0,
 			playlist: [
 				"http://localhost:8080/test.flac",
@@ -96,6 +94,8 @@ export default {
 	},
 
 	computed: {
+		...mapState(['isPlaying']),
+
 		playlistSize() {
 			return this.playlist.length
 		}
@@ -159,15 +159,7 @@ export default {
 		},
 
 		togglePlay() {
-			let player = this.$refs.player;
-
-			if (this.isPlaying) {
-				player.pause();
-			} else {
-				player.play();
-			}
 			
-			this.isPlaying = !this.isPlaying;
 		},
 
 		toggleRepeat() {
@@ -219,14 +211,13 @@ export default {
 
 		pauseListener() {
 			console.log('playback paused');
-			this.isPlaying = false;
 			this.cleanupListeners();
 		},
 
 		// when playback ends
 		endListener() {
 			console.log('playback ended');
-			this.isPlaying = false;
+			this.$store.commit("togglePlay", false);
 			this.cleanupListeners();
 			player.removeEventListener("ended", this.endListener);
 		},
@@ -250,6 +241,16 @@ export default {
 	},
 
 	watch: {
+		isPlaying() {
+			let player = this.$refs.player;
+
+			if (this.isPlaying) {
+				player.play();
+			} else {
+				player.pause();
+			}
+		},
+
 		playbackTime(newValue, oldValue) {
 			// update current audio position when user drags progress slider or seeks
 			let player = this.$refs.player;
@@ -279,10 +280,10 @@ export default {
 
 			player.oncanplay = function() {
 				console.log('>> audio can play');
-				this.audioLoaded = true;
-				if (this.isPlaying) {
-					player.play();
-				}
+				// this.audioLoaded = true;
+				// if (this.isPlaying) {
+				// 	player.play();
+				// }
 			}.bind(this);
 
 			player.onplay = function() {

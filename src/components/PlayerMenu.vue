@@ -62,6 +62,7 @@
 
 <script>
 import BaseIcon from '@/components/BaseIcon.vue';
+import { mapState } from 'vuex';
 
 export default {
 	components: {
@@ -72,11 +73,6 @@ export default {
 		activeTrack: {
 			type: Number,
 			default: 0
-		},
-
-		isPlaying: {
-			type: Boolean,
-			default: false
 		},
 
 		playlistSize: {
@@ -102,6 +98,8 @@ export default {
 	},
 
 	computed: {
+		...mapState(['isPlaying']),
+
 		isFirstTrack() {
 			return this.activeTrack === 0
 		},
@@ -129,7 +127,7 @@ export default {
 		},
 
 		togglePlay() {
-			this.$emit('togglePlay');
+			this.$store.commit("togglePlay");
 		},
 		
 		toggleRepeat() {

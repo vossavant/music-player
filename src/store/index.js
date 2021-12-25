@@ -4,8 +4,15 @@ import Vuex from "vuex";
 Vue.use(Vuex);
 
 export default new Vuex.Store({
-	state: {},
-	mutations: {},
+	state: {
+		isPlaying: false
+	},
+
+	mutations: {
+		togglePlay(state, n) {
+			state.isPlaying = !state.isPlaying;
+		}
+	},
 	actions: {},
 	modules: {},
 });
