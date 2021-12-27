@@ -18,8 +18,11 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr @click="loadTrack(0)">
-					<th>1</th>
+				<tr :class="{ playing : isPlaying && currentTrack === 0 }" @click="loadTrack(0)">
+					<th>
+						<BaseIcon icon="bar_chart" color="#3470A2" />
+						<span>1</span>
+					</th>
 					<td>
 						<span>
 							Vecchio e il bambino
@@ -32,8 +35,11 @@
 					<td>Dec 11, 2021</td>
 					<td>3:24</td>
 				</tr>
-				<tr @click="loadTrack(1)">
-					<th>2</th>
+				<tr :class="{ playing : isPlaying && currentTrack === 1 }" @click="loadTrack(1)">
+					<th>
+						<BaseIcon icon="bar_chart" color="#3470A2" />
+						<span>2</span>
+					</th>
 					<td>
 						<span>
 							Rococo
@@ -46,8 +52,11 @@
 					<td>Dec 11, 2021</td>
 					<td>3:56</td>
 				</tr>
-				<tr @click="loadTrack(2)">
-					<th>3</th>
+				<tr :class="{ playing : isPlaying && currentTrack === 2 }" @click="loadTrack(2)">
+					<th>
+						<BaseIcon icon="bar_chart" color="#3470A2" />
+						<span>3</span>
+					</th>
 					<td>
 						<span>
 							Benny and the Jets
@@ -67,9 +76,15 @@
 
 <script>
 import BaseIcon from '@/components/BaseIcon.vue';
+import { mapState } from 'vuex';
+
 export default {
 	components: {
 		BaseIcon,
+	},
+
+	computed: {
+		...mapState(['currentTrack', 'isPlaying'])
 	},
 
 	methods: {
@@ -136,14 +151,29 @@ tbody {
 
 	th {
 		font-size: 14px;
+		width: 45px;
+
+		svg {
+			display: none;
+		}
 	}
 
 	tr {
 		cursor: pointer;
 
 		&:hover td,
-		&:hover th {
+		&:hover th,
+		&.playing td,
+		&.playing th {
 			background: #E5F3FF;
+		}
+
+		&.playing th span {
+			display: none;
+		}
+
+		&.playing th svg {
+			display: block;
 		}
 	}
 
