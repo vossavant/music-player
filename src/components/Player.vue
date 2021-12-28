@@ -205,8 +205,14 @@ export default {
 			console.log('>> playback ended');
 			this.prevTrackPlayedThrough = false;
 
+			// TODO: not DRY
 			if (this.currentTrack < this.playlistSize) {
 				this.$store.commit("skipTrack", 1);
+				this.prevTrackPlayedThrough = true;
+			}
+
+			if (this.currentTrack === this.playlistSize && this.repeatOn) {
+				this.$store.commit("loadTrack", 1);
 				this.prevTrackPlayedThrough = true;
 			}
 
