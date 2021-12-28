@@ -73,6 +73,7 @@ export default {
 				"http://localhost:8080/test-2.flac",
 				"http://localhost:8080/test-3.flac",
 			],
+			prevTrackPlayedThrough: false,
 			repeatOn: false,
 			shuffleOn: false,
 			trackType: null,
@@ -84,7 +85,11 @@ export default {
 	},
 
 	computed: {
-		...mapState(['currentTrack', 'isPlaying']),
+		...mapState(['currentTrack', 'isPlaying', 'playlistSize']),
+
+		isLastTrack() {
+			return this.playlistSize - 1 - this.currentTrack === 0
+		}
 	},
 
 	methods: {
@@ -178,14 +183,22 @@ export default {
 		},
 
 		pauseListener() {
-			console.log('playback paused');
+			console.log('>> playback paused');
 			this.cleanupListeners();
 		},
 
 		// when playback ends
 		endListener() {
-			console.log('playback ended');
+			console.log('>> playback ended');
+			this.prevTrackPlayedThrough = false;
+
+			if (this.currentTrack + 1 < this.playlistSize) {
+				this.$store.commit("skipTrack", 1);
+				this.prevTrackPlayedThrough = true;
+			}
+
 			this.$store.commit("togglePlay", false);
+			this.playbackTime = 0;
 			this.cleanupListeners();
 			player.removeEventListener("ended", this.endListener);
 		},
@@ -248,10 +261,10 @@ export default {
 
 			player.oncanplay = function() {
 				console.log('>> audio can play');
-				// this.audioLoaded = true;
-				// if (this.isPlaying) {
-				// 	player.play();
-				// }
+				if (this.prevTrackPlayedThrough) {
+					this.$store.commit("togglePlay", true);
+					this.prevTrackPlayedThrough = false;
+				}
 			}.bind(this);
 
 			player.onplay = function() {

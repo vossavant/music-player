@@ -32,7 +32,11 @@ export default new Vuex.Store({
 		},
 
 		togglePlay(state, n) {
-			state.isPlaying = !state.isPlaying;
+			if (n) {
+				state.isPlaying = n
+			} else {
+				state.isPlaying = !state.isPlaying;
+			}
 		}
 	},
 	actions: {},
