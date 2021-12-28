@@ -71,7 +71,7 @@ export default {
 
 	props: {
 		playbackTime: {
-			type: Number,
+			type: [Number, String],
 			default: 0
 		},
 
