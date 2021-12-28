@@ -70,6 +70,11 @@ export default {
 	},
 
 	props: {
+		playbackTime: {
+			type: Number,
+			default: 0
+		},
+
 		repeatOn: {
 			type: [Boolean, String],
 			default: false
@@ -114,8 +119,13 @@ export default {
 		},
 
 		skipPrev() {
-			this.$store.commit("skipTrack", -1);
-			this.$emit('trackSkipped');
+			// double tap to skip to prev track if current track has played for at least 1 second
+			if (this.playbackTime > 1) {
+				this.$emit('playbackTime', -10000);
+			} else {
+				this.$store.commit("skipTrack", -1);
+				this.$emit('trackSkipped');
+			}
 		},
 
 		togglePlay() {

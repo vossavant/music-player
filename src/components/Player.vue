@@ -28,6 +28,7 @@
 		</article>
 
 		<PlayerMenu 
+			:playbackTime="playbackTime"
 			:repeatOn="repeatOn"
 			:shuffleOn="shuffleOn"
 			@playbackTime="adjustPlaybackTime($event)"
