@@ -33,6 +33,7 @@
 			@playbackTime="adjustPlaybackTime($event)"
 			@toggleRepeat="toggleRepeat()"
 			@toggleShuffle="toggleShuffle()"
+			@trackSkipped="trackSkipped()"
 		/>
 
 		<input
@@ -74,6 +75,7 @@ export default {
 				"http://localhost:8080/test-3.flac",
 			],
 			prevTrackPlayedThrough: false,
+			prevTrackSkippedWhilePlaying: false,
 			repeatOn: false,
 			shuffleOn: false,
 			trackType: null,
@@ -151,6 +153,16 @@ export default {
 			} else {
 				this.shuffleOn = false;
 			}
+		},
+
+		trackSkipped() {
+			if (this.isPlaying) {
+				this.$store.commit("togglePlay", false);
+				this.prevTrackSkippedWhilePlaying = true;
+				this.cleanupListeners();
+			}
+
+			this.playbackTime = 0;
 		},
 
 		convertTimeToMinsSecs(seconds) {
@@ -264,6 +276,11 @@ export default {
 				if (this.prevTrackPlayedThrough) {
 					this.$store.commit("togglePlay", true);
 					this.prevTrackPlayedThrough = false;
+				}
+
+				if (this.prevTrackSkippedWhilePlaying) {
+					this.$store.commit("togglePlay", true);
+					this.prevTrackSkippedWhilePlaying = false;
 				}
 			}.bind(this);
 

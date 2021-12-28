@@ -110,10 +110,12 @@ export default {
 		
 		skipNext() {
 			this.$store.commit("skipTrack", 1);
+			this.$emit('trackSkipped');
 		},
 
 		skipPrev() {
 			this.$store.commit("skipTrack", -1);
+			this.$emit('trackSkipped');
 		},
 
 		togglePlay() {
