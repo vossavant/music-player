@@ -8,7 +8,7 @@
 				id="player"
 				ref="player"
 				preload="metadata"
-				:src="playlist[currentTrack]"
+				:src="playlist[currentTrack - 1]"
 			>
 				Your browser does not support the <code>audio</code> element.
 			</audio>
@@ -88,7 +88,7 @@ export default {
 		...mapState(['currentTrack', 'isPlaying', 'playlistSize']),
 
 		isLastTrack() {
-			return this.playlistSize - 1 - this.currentTrack === 0
+			return this.playlistSize - this.currentTrack === 0
 		}
 	},
 
@@ -104,7 +104,7 @@ export default {
 			var jsmediatags = require("jsmediatags");
 			let self = this;
 
-			jsmediatags.read(this.playlist[this.currentTrack], {
+			jsmediatags.read(this.playlist[this.currentTrack - 1], {
 				onSuccess: function (result) {
 					console.log(result);
 					self.trackType = result.type;
@@ -192,7 +192,7 @@ export default {
 			console.log('>> playback ended');
 			this.prevTrackPlayedThrough = false;
 
-			if (this.currentTrack + 1 < this.playlistSize) {
+			if (this.currentTrack < this.playlistSize) {
 				this.$store.commit("skipTrack", 1);
 				this.prevTrackPlayedThrough = true;
 			}

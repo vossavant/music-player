@@ -5,7 +5,7 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
 	state: {
-		currentTrack: 0,
+		currentTrack: 1,
 		isPlaying: false,
 		playlistSize: 0
 	},
@@ -22,8 +22,8 @@ export default new Vuex.Store({
 				state.currentTrack = 0;
 			}
 
-			if (state.currentTrack > (state.playlistSize - 1)) {
-				state.currentTrack = state.playlistSize - 1
+			if (state.currentTrack > state.playlistSize) {
+				state.currentTrack = state.playlistSize
 			}
 		},
 

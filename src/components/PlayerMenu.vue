@@ -91,11 +91,11 @@ export default {
 		...mapState(['currentTrack', 'isPlaying', 'playlistSize']),
 
 		isFirstTrack() {
-			return this.currentTrack === 0
+			return this.currentTrack === 1
 		},
 
 		isLastTrack() {
-			return this.playlistSize - 1 - this.currentTrack === 0
+			return this.playlistSize - this.currentTrack === 0
 		}
 	},
 

@@ -18,7 +18,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr :class="{ current: currentTrack === 0, playing : isPlaying && currentTrack === 0 }" @click="loadTrack(0)">
+				<tr :class="{ current: currentTrack === 1, playing : isPlaying && currentTrack === 1 }" @click="loadTrack(1)">
 					<th>
 						<BaseIcon icon="bar_chart" color="#3470A2" />
 						<span>1</span>
@@ -35,7 +35,7 @@
 					<td>Dec 11, 2021</td>
 					<td>3:24</td>
 				</tr>
-				<tr :class="{ current: currentTrack === 1, playing : isPlaying && currentTrack === 1 }" @click="loadTrack(1)">
+				<tr :class="{ current: currentTrack === 2, playing : isPlaying && currentTrack === 2 }" @click="loadTrack(2)">
 					<th>
 						<BaseIcon icon="bar_chart" color="#3470A2" />
 						<span>2</span>
@@ -52,7 +52,7 @@
 					<td>Dec 11, 2021</td>
 					<td>3:56</td>
 				</tr>
-				<tr :class="{ current: currentTrack === 2, playing : isPlaying && currentTrack === 2 }" @click="loadTrack(2)">
+				<tr :class="{ current: currentTrack === 3, playing : isPlaying && currentTrack === 3 }" @click="loadTrack(3)">
 					<th>
 						<BaseIcon icon="bar_chart" color="#3470A2" />
 						<span>3</span>
