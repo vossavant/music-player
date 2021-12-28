@@ -146,6 +146,7 @@ tbody {
 	td,
 	th {
 		padding: 8px 0;
+		transition: background 200ms ease-in-out;
 		vertical-align: middle;
 	}
 
@@ -162,7 +163,10 @@ tbody {
 		cursor: pointer;
 
 		&:hover td,
-		&:hover th,
+		&:hover th {
+			background: lighten(#E5F3FF, 3%);
+		}
+
 		&.playing td,
 		&.playing th {
 			background: #E5F3FF;
