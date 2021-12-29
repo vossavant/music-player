@@ -203,17 +203,25 @@ export default {
 		// when playback ends
 		endListener() {
 			console.log('>> playback ended');
-			this.prevTrackPlayedThrough = false;
+			// this.prevTrackPlayedThrough = false;
 
 			// TODO: not DRY
-			if (this.currentTrack < this.playlistSize) {
-				this.$store.commit("skipTrack", 1);
+			if (this.repeatOn === "track") {
+				// if repeat "track" then restart current track
+				this.$store.commit("loadTrack", this.currentTrack);
 				this.prevTrackPlayedThrough = true;
-			}
-
-			if (this.currentTrack === this.playlistSize && this.repeatOn) {
-				this.$store.commit("loadTrack", 1);
-				this.prevTrackPlayedThrough = true;
+			} else {
+				if (this.currentTrack < this.playlistSize) {
+					// if not the last track, skip ahead one
+					this.$store.commit("skipTrack", 1);
+					this.prevTrackPlayedThrough = true;
+				}
+	
+				else if (this.currentTrack === this.playlistSize && this.repeatOn) {
+					// if the last track and repeat all, skip to first track
+					this.$store.commit("loadTrack", 1);
+					this.prevTrackPlayedThrough = true;
+				}
 			}
 
 			this.$store.commit("togglePlay", false);
