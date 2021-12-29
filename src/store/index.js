@@ -18,12 +18,12 @@ export default new Vuex.Store({
 		skipTrack(state, n) {
 			state.currentTrack += n;
 
-			if (state.currentTrack < 0) {
-				state.currentTrack = 0;
+			if (state.currentTrack < 1) {
+				state.currentTrack = state.playlistSize;
 			}
 
 			if (state.currentTrack > state.playlistSize) {
-				state.currentTrack = state.playlistSize
+				state.currentTrack = 1;
 			}
 		},
 
