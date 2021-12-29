@@ -37,7 +37,7 @@
 			</button>
 		</li>
 		<li>
-			<button :disabled="isLastTrack" @click="skipNext">
+			<button :disabled="isLastTrack && repeatOn !== true" @click="skipNext">
 				<BaseIcon icon="skip_next" color="#000000" size="24" />
 			</button>
 		</li>
