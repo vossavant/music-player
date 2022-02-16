@@ -5,6 +5,8 @@
 			<p>70 songs (5:32:14)</p>
 		</header>
 
+		{{ fileList }}
+
 		<table>
 			<thead>
 				<tr>
@@ -87,10 +89,67 @@ export default {
 		...mapState(['currentTrack', 'isPlaying'])
 	},
 
+	data() {
+		return {
+			fileList: {}
+		}
+	},
+
 	methods: {
+		getID3tags(file) {
+			var jsmediatags = require("jsmediatags");
+			let self = this;
+
+			jsmediatags.read(file, {
+				onSuccess: function (result) {
+					console.log(result);
+					self.trackType = result.type;
+					self.trackAlbum = result.tags.album;
+					self.trackArtist = result.tags.artist;
+					self.trackTitle = result.tags.title;
+
+					if (result.tags.picture) {
+						const { data, format } = result.tags.picture;
+						let base64String = "";
+						for (let i = 0; i < data.length; i++) {
+							base64String += String.fromCharCode(data[i]);
+						}
+						self.trackPicture = `data:${data.format};base64,${window.btoa(
+							base64String
+						)}`;
+					} else {
+						self.trackPicture = require("@/assets/missing.svg")
+					}
+				},
+				onError: function (error) {
+					console.log(":(", error.type, error.info);
+				},
+			});
+		},
+
+		loadAudioFiles(r) {
+			// console.log('...', r)
+			r.keys().forEach((key) =>
+				this.fileList[key] = r(key)
+				// console.log(r(key))
+			);
+			// console.log(this.fileList)
+			// r.keys().forEach((key) => (this.fileList[key] = r(key)));
+
+			for (const [key, value] of Object.entries(this.fileList)) {
+				console.log(`${key}: ${value}`);
+				this.getID3tags(key)
+			}
+		},
+
 		loadTrack(track) {
 			this.$store.commit('loadTrack', track);
 		}
+	},
+
+	mounted () {
+		// https://webpack.js.org/guides/dependency-management/#requirecontext
+		this.loadAudioFiles(require.context("../assets/flac/", true, /\.flac$/));
 	},
 };
 </script>

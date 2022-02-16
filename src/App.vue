@@ -14,9 +14,9 @@ https://muhammadatt.medium.com/building-an-mp3-audio-player-in-vue-js-c588420725
 </template>
 
 <script>
-import BaseNav from '@/components/BaseNav.vue';
-import MainPanel from '@/components/MainPanel.vue';
-import Player from '@/components/Player.vue';
+import BaseNav from "@/components/BaseNav.vue";
+import MainPanel from "@/components/MainPanel.vue";
+import Player from "@/components/Player.vue";
 
 export default {
 	components: {
